@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Memory Match Game</title>
+
+    <style>
+        body {
+            text-align: center;
+            background: #222;
+            color: white;
+            font-family: Arial;
+        }
+
+        .game {
+            display: grid;
+            grid-template-columns: repeat(4, 80px);
+            gap: 10px;
+            justify-content: center;
+            margin: 30px;
+        }
+
+        .card {
+            background: purple;
+            height: 80px;
+            font-size: 35px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            border-radius: 10px;
+        }
+
+        button {
+            padding: 12px 20px;
+            cursor: pointer;
+            border: none;
+            border-radius: 8px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <h1>Memory Match 🎮</h1>
+    <h3>Find all matching pairs!</h3>
+
+    <p>Moves: <span id="moves">0</span></p>
+
+    <div class="game" id="game"></div>
+
+    <h2 id="message"></h2>
+
+    <button onclick="restart()">Restart Game</button>
+
+    <script>
+
+        let symbols = ["🍎", "🍌", "🍇", "🍒",
+                       "🍎", "🍌", "🍇", "🍒"];
+
+        let firstCard = null;
+        let secondCard = null;
+        let moves = 0;
+        let matched = 0;
+        let locked = false;
+
+        symbols.sort(() => Math.random() - 0.5);
+
+        let game = document.getElementById("game");
+
+        function createCards() {
+
+            game.innerHTML = "";
+
+            symbols.forEach((symbol) => {
+
+                let card = document.createElement("div");
+
+                card.className = "card";
+                card.dataset.symbol = symbol;
+                card.innerHTML = "?";
+
+                card.onclick = function() {
+                    flipCard(card);
+                };
+
+                game.appendChild(card);
+            });
+        }
+
+        function flipCard(card) {
+
+            if (locked || card === firstCard ||
+                card.innerHTML !== "?") return;
+
+            card.innerHTML = card.dataset.symbol;
+
+            if (firstCard === null) {
+                firstCard = card;
+            }
+
+            else {
+                secondCard = card;
+                moves++;
+
+                document.getElementById("moves").innerHTML = moves;
+
+                if (firstCard.dataset.symbol === secondCard.dataset.symbol) {
+
+                    matched++;
+
+                    firstCard = null;
+                    secondCard = null;
+
+                    if (matched === 4) {
+                        document.getElementById("message").innerHTML =
+                            "Congratulations! You won! 🎉";
+                    }
+                }
+
+                else {
+
+                    locked = true;
+
+                    setTimeout(function() {
+
+                        firstCard.innerHTML = "?";
+                        secondCard.innerHTML = "?";
+
+                        firstCard = null;
+                        secondCard = null;
+                        locked = false;
+
+                    }, 1000);
+                }
+            }
+        }
+
+        function restart() {
+
+            firstCard = null;
+            secondCard = null;
+            moves = 0;
+            matched = 0;
+            locked = false;
+
+            document.getElementById("moves").innerHTML = 0;
+            document.getElementById("message").innerHTML = "";
+
+            symbols.sort(() => Math.random() - 0.5);
+
+            createCards();
+        }
+
+        createCards();
+
+    </script>
+
+</body>
+</html>
